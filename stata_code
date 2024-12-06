@@ -1,0 +1,75 @@
+**If you do this, you should receive identical values to what you had before
+*If not, its a sign to redo you analysis. A sort of placebo test 
+
+
+********************************************************************************
+* (1) FIND THE DATA
+*Final Growth rate 
+*year
+*GDP
+*Net factor income from abroad 
+
+*This version gets you two variables at once
+wbopendata, indicator(NY.GNP.PCAP.CD; NY.GDP.PCAP.KD.ZG; NY.GDP.MKTP.KD.ZG) clear long
+*GNI per capita (Atlas Methods), growth rate (per capita), growth rate 
+
+**all the data is in the world development indicators. Can you do the command
+***just for the ones you want 
+********************************************************************************
+
+********************************************************************************
+* (2) CREATE THE FUNCTION
+*the growth rate 
+keep if countrycode == "MWI"
+drop countrycode countryname region regionname adminregion adminregionname incomelevel incomelevelname lendingtype lendingtypename
+
+
+*dates
+set obs 71
+replace year = 2024 in 65
+replace year = 2025 in 66
+replace year = 2026 in 67
+replace year = 2027 in 68
+replace year = 2028 in 69
+replace year = 2029 in 70
+replace year = 2030 in 71
+gen time = 2030 - year
+
+*name variables for easy
+ren ny_gnp_pcap_cd GNIper
+ren ny_gdp_pcap_kd_zg growthRate_per
+ren ny_gdp_mktp_kd_zg growthRate
+
+gen want = 1146
+
+*sum growthRate if year >= 2019
+*2.292535
+
+*tsset year
+*tsline growthRate_per
+*tsline GNIper
+*sum growthRate_per if year >= 2010
+*0.7818754
+
+*last year
+* 1.539642
+
+replace growthRate = 0.7818754 if growthRate == .
+replace GNIper = GNIper[_n-1]* (1+0.007818754) if GNIper == .
+
+
+*This wont work until you feed in the forecasts 
+gen growth_need = (((want/GNIper)^(1/time))-1) * 100 
+********************************************************************************
+
+
+********************************************************************************
+* (3) USE THE VIEW COMMAND TO GET THE "growth_need" YOU NEED FOR EACH YEAR
+
+
+********************************************************************************
+
+*Profit
+
+
+
